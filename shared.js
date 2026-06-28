@@ -1,8 +1,10 @@
 // ── Auth ─────────────────────────────────────────────────────────
 function getRole(){return localStorage.getItem('tk_role')||'customer';}
 function setRole(r){localStorage.setItem('tk_role',r);}
-function canEdit(){const r=getRole();return r==='admin'||r==='media';}
-function isAdmin(){return getRole()==='admin';}
+function canEdit(){const r=getRole();return r==='admin'||r==='media'||r==='special';}
+function isAdmin(){return getRole()==='admin'||getRole()==='special';}
+function isSpecial(){return getRole()==='special';}
+function canEditAny(){const r=getRole();return r==='admin'||r==='media'||r==='special';}
 
 // ── Supabase ──────────────────────────────────────────────────────
 const SB_URL="https://wqeadksvszjnloavxruf.supabase.co";
@@ -45,6 +47,7 @@ function initRole(){
   const r=getRole(),b=document.getElementById('roleBadge');if(!b)return;
   if(r==='admin'){b.textContent='Admin';b.className='role-badge';}
   else if(r==='media'){b.textContent='Media';b.className='role-badge media';}
+  else if(r==='special'){b.textContent='Special';b.className='role-badge special';}
   else{b.textContent='Viewing';b.className='role-badge customer';}
 }
 

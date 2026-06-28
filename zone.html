@@ -71,7 +71,7 @@
 // Supabase loaded from shared.js
 
 function showToast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.style.background=err?'#1f0000':'#001a0a';t.style.borderColor=err?'#dc2626':'#16a34a';t.style.color=err?'#f87171':'#4ade80';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
-function initRole(){const r=getRole(),b=document.getElementById('roleBadge');if(r==='admin'){b.textContent='Admin';b.className='role-badge';}else if(r==='media'){b.textContent='Media';b.className='role-badge media';}else{b.textContent='Viewing';b.className='role-badge customer';}}
+function initRole(){const r=getRole(),b=document.getElementById('roleBadge');if(r==='admin'){b.textContent='Admin';b.className='role-badge';}else if(r==='media'){b.textContent='Media';b.className='role-badge media';}else if(r==='special'){b.textContent='Special';b.className='role-badge special';}else{b.textContent='Viewing';b.className='role-badge customer';}}
 
 let all=[],eid=null;
 async function init(){
