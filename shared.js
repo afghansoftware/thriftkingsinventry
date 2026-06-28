@@ -17,7 +17,9 @@ async function sbReq(table,method,body,filter){
   if(method==='GET')p.push('select=*','order=created_at.desc');
   if(filter)Object.entries(filter).forEach(([k,v])=>p.push(k+'=eq.'+encodeURIComponent(v)));
   if(p.length)url+='?'+p.join('&');
-  const opts={method,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':''}};
+  const headers={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+  if(method==='POST'||method==='PATCH')headers['Prefer']='return=representation';
+  const opts={method,headers};
   if(body)opts.body=JSON.stringify(body);
   try{
     const res=await fetch(url,opts);

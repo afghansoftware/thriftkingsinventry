@@ -2,10 +2,10 @@
 CREATE TABLE IF NOT EXISTS public.petty_cash (
   id bigint primary key generated always as identity,
   created_at timestamp with time zone default now() not null,
-  type text not null, -- 'in', 'out', or 'transfer'
+  type text not null, -- 'in' or 'out'
   amount numeric not null,
-  "desc" text not null,
-  "by" text,
+  description text not null,
+  by_whom text,
   date date not null,
   note text
 );

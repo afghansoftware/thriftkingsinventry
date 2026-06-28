@@ -132,9 +132,18 @@ let allTx=[];
 async function loadTx(){
   showLoader();
   let remote=await sbGet('petty_cash');
-  if(remote && Array.isArray(remote) && remote.length>0){
-    allTx=remote;
-    localStorage.setItem('tk_petty',JSON.stringify(remote));
+  if(remote && Array.isArray(remote)){
+    allTx=remote.map(x=>({
+      id: x.id,
+      type: x.type,
+      amount: x.amount,
+      desc: x.description || x.desc || '',
+      by: x.by_whom || x.by || '',
+      date: x.date,
+      note: x.note || '',
+      created_at: x.created_at
+    }));
+    localStorage.setItem('tk_petty',JSON.stringify(allTx));
   }else{
     allTx=JSON.parse(localStorage.getItem('tk_petty')||'[]');
   }
@@ -221,9 +230,9 @@ async function addTx(){
   if(!desc){showToast('Description required',true);return;}
   if(!date){showToast('Date required',true);return;}
   
-  const newItem={id:Date.now().toString(),type:txType,amount:amt,"desc":desc,"by":by,date:date,note:note,created_at:new Date().toISOString()};
+  const newItem={id:Date.now().toString(),type:txType,amount:amt,desc:desc,by:by,date:date,note:note,created_at:new Date().toISOString()};
   showLoader();
-  const res=await sbInsert('petty_cash',{type:txType,amount:amt,"desc":desc,"by":by,date:date,note:note});
+  const res=await sbInsert('petty_cash',{type:txType,amount:amt,description:desc,by_whom:by,date:date,note:note});
   hideLoader();
   
   if(res){
@@ -328,34 +337,41 @@ function exportPDF(){
   const sorted=[...allTx].sort((a,b)=>a.date.localeCompare(b.date));
   const rows=sorted.map(x=>`<tr style="border-bottom:1px solid #eee">
     <td style="padding:8px">${x.date}</td>
-    <td style="padding:8px;font-weight:700;color:${x.type==='in'?'green':x.type==='out'?'red':'#b8860b'}">${x.type.toUpperCase()}</td>
+    <td style="padding:8px;font-weight:700;color:${x.type==='in'?'green':'red'}">${x.type.toUpperCase()}</td>
     <td style="padding:8px">${x.desc}</td>
     <td style="padding:8px">${x.type==='out'?'To: ':'By: '}${x.by||'—'}</td>
     <td style="padding:8px;font-weight:700;text-align:right">PKR ${x.amount.toLocaleString()}</td>
     <td style="padding:8px;color:#666">${x.note||''}</td>
   </tr>`).join('');
-  const html=`<!DOCTYPE html><html><head><title>TK Petty Cash Report</title>
-  <style>body{font-family:Arial,sans-serif;padding:30px;max-width:900px;margin:0 auto}
-  h1{color:#0a0a0a;border-bottom:3px solid #dc2626;padding-bottom:10px}
-  .sum{display:flex;gap:20px;margin:20px 0}
-  .sum-card{flex:1;padding:15px;border-radius:8px;text-align:center}
-  table{width:100%;border-collapse:collapse;margin-top:20px}
-  th{background:#0a0a0a;color:#fff;padding:10px;text-align:left}
-  @media print{body{padding:10px}.noprint{display:none}}</style></head>
-  <body>
-  <h1>🏪 Thrift Kings — Petty Cash Report</h1>
-  <p style="color:#666">Generated: ${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p>
-  <div class="sum">
-    <div class="sum-card" style="background:#0a1a0a;color:#4ade80"><div style="font-size:24px;font-weight:700">PKR ${totalIn.toLocaleString()}</div><div>Total Cash In</div></div>
-    <div class="sum-card" style="background:#1f0000;color:#f87171"><div style="font-size:24px;font-weight:700">PKR ${totalOut.toLocaleString()}</div><div>Total Cash Out</div></div>
-    <div class="sum-card" style="background:#0a0a0a;color:${(totalIn-totalOut)>=0?'#4ade80':'#f87171'}"><div style="font-size:24px;font-weight:700">PKR ${(totalIn-totalOut).toLocaleString()}</div><div>Net Balance</div></div>
-  </div>
-  <table><thead><tr>
-    <th>Date</th><th>Type</th><th>Description</th><th>To / By Whom</th><th>Amount</th><th>Notes</th>
-  </tr></thead><tbody>${rows}</tbody></table>
-  <button class="noprint" onclick="window.print()" style="margin-top:20px;padding:12px 24px;background:#dc2626;color:#fff;border:none;border-radius:6px;font-size:14px;cursor:pointer">🖨 Print</button>
-  </body></html>`;
-  const w=window.open('','_blank');w.document.write(html);w.document.close();
+
+  let printArea=document.getElementById('printArea');
+  if(!printArea){
+    printArea=document.createElement('div');
+    printArea.id='printArea';
+    document.body.appendChild(printArea);
+  }
+  printArea.innerHTML=`<div style="font-family:Arial,sans-serif;padding:20px;color:#1e293b;background:#fff">
+    <h1 style="color:#0a0a0a;border-bottom:3px solid #dc2626;padding-bottom:10px;margin-top:0">🏪 Thrift Kings — Petty Cash Report</h1>
+    <p style="color:#666;font-size:13px">Generated: ${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</p>
+    <div style="display:flex;gap:20px;margin:20px 0">
+      <div style="flex:1;padding:15px;border-radius:8px;text-align:center;background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0"><div style="font-size:24px;font-weight:700">PKR ${totalIn.toLocaleString()}</div><div>Total Cash In</div></div>
+      <div style="flex:1;padding:15px;border-radius:8px;text-align:center;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca"><div style="font-size:24px;font-weight:700">PKR ${totalOut.toLocaleString()}</div><div>Total Cash Out</div></div>
+      <div style="flex:1;padding:15px;border-radius:8px;text-align:center;background:#f8fafc;color:#0f172a;border:1px solid #e2e8f0"><div style="font-size:24px;font-weight:700">PKR ${(totalIn-totalOut).toLocaleString()}</div><div>Net Balance</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;margin-top:20px">
+      <thead>
+        <tr style="background:#0f172a;color:#fff;text-align:left">
+          <th style="padding:10px;font-size:12px">Date</th><th style="padding:10px;font-size:12px">Type</th><th style="padding:10px;font-size:12px">Description</th><th style="padding:10px;font-size:12px">To / By Whom</th><th style="padding:10px;font-size:12px;text-align:right">Amount</th><th style="padding:10px;font-size:12px">Notes</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+  
+  setTimeout(()=>{
+    window.print();
+    printArea.remove();
+  },100);
 }
 
 async function init(){
