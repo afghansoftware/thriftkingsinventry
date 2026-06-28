@@ -129,30 +129,39 @@ async function downloadDailyMediaReport(){
   const totalPcs=todayItems.length*10;
   const formattedDate=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
+  // Render visibly on-screen so html2canvas can capture it
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:#000;opacity:0.85;z-index:99998';
+  document.body.appendChild(overlay);
+
   const printArea=document.createElement('div');
-  printArea.style.position='absolute';
-  printArea.style.left='-9999px';
-  printArea.style.width='950px';
+  printArea.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:auto;z-index:99999;background:#fff';
   document.body.appendChild(printArea);
 
-  printArea.innerHTML=`<div style="font-family:Arial,sans-serif;padding:30px;color:#1e293b;background:#fff">
-    <div style="border-bottom:3px solid #dc2626;padding-bottom:12px;margin-bottom:20px">
-      <h1 style="margin:0;font-size:22px;color:#0f172a">👑 THRIFT KINGS — DAILY MEDIA UPLOADS REPORT</h1>
-      <div style="color:#64748b;font-size:13px;margin-top:4px">Generated for Special User · Date: ${formattedDate}</div>
+  printArea.innerHTML=`<div style="font-family:Arial,Helvetica,sans-serif;padding:30px;color:#1e293b;background:#ffffff;min-height:100vh">
+    <div style="border-bottom:4px solid #dc2626;padding-bottom:14px;margin-bottom:24px">
+      <h1 style="margin:0;font-size:22px;color:#0f172a;font-family:Arial,sans-serif">&#128081; THRIFT KINGS &mdash; DAILY MEDIA UPLOADS REPORT</h1>
+      <div style="color:#64748b;font-size:13px;margin-top:6px;font-family:Arial,sans-serif">Generated for Special User &middot; Date: ${formattedDate}</div>
     </div>
-    <div style="display:flex;gap:16px;margin-bottom:24px">
-      <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;padding:14px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:bold;color:#0f172a">${todayItems.length}</div><div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Bundles Uploaded Today</div></div>
-      <div style="flex:1;background:#f8fafc;border:1px solid #e2e8f0;padding:14px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:bold;color:#0f172a">${totalPcs} Pcs</div><div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">Total Estimated Items</div></div>
+    <div style="display:flex;gap:16px;margin-bottom:28px">
+      <div style="flex:1;background:#f8fafc;border:2px solid #e2e8f0;padding:16px;border-radius:8px;text-align:center">
+        <div style="font-size:22px;font-weight:bold;color:#0f172a;font-family:Arial,sans-serif">${todayItems.length}</div>
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;font-family:Arial,sans-serif">Bundles Uploaded Today</div>
+      </div>
+      <div style="flex:1;background:#f8fafc;border:2px solid #e2e8f0;padding:16px;border-radius:8px;text-align:center">
+        <div style="font-size:22px;font-weight:bold;color:#0f172a;font-family:Arial,sans-serif">${totalPcs} Pcs</div>
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;font-family:Arial,sans-serif">Total Estimated Items</div>
+      </div>
     </div>
-    <table style="width:100%;border-collapse:collapse;margin-top:10px">
+    <table style="width:100%;border-collapse:collapse">
       <thead>
-        <tr style="background:#0f172a;color:#fff;text-align:left">
-          <th style="padding:10px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Serial #</th>
-          <th style="padding:10px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Item / Bundle Name</th>
-          <th style="padding:10px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Brand</th>
-          <th style="padding:10px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Category</th>
-          <th style="padding:10px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Sizes</th>
-          <th style="padding:10px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;text-align:center">Quantity</th>
+        <tr style="background:#0f172a">
+          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Serial #</th>
+          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Item / Bundle Name</th>
+          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Brand</th>
+          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Category</th>
+          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Sizes</th>
+          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:center;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Quantity</th>
         </tr>
       </thead>
       <tbody>
@@ -160,25 +169,26 @@ async function downloadDailyMediaReport(){
       </tbody>
     </table>
   </div>`;
-  
-  const opt = {
-    margin:       [10, 10, 10, 10],
-    filename:     'TK_Daily_Media_Report_'+todayStr+'.pdf',
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, logging: false, useCORS: true },
-    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+
+  const opt={
+    margin:[8,8,8,8],
+    filename:'TK_Daily_Media_Report_'+todayStr+'.pdf',
+    image:{type:'jpeg',quality:0.98},
+    html2canvas:{scale:2,logging:false,useCORS:true,allowTaint:true,backgroundColor:'#ffffff'},
+    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
   };
   
-  html2pdf().set(opt).from(printArea).save().then(() => {
+  html2pdf().set(opt).from(printArea.firstChild).save().then(() => {
     printArea.remove();
+    overlay.remove();
     hideLoader();
     showToast('PDF downloaded successfully!');
   }).catch(err => {
     printArea.remove();
+    overlay.remove();
     hideLoader();
     console.error(err);
-    showToast('PDF download failed. Trying print dialog...', true);
-    window.print();
+    showToast('PDF download failed', true);
   });
 }
 
