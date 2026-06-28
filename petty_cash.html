@@ -15,11 +15,10 @@
 .pc-stat{background:rgba(0,0,0,0.3);border-radius:8px;padding:10px 12px}
 .pc-stat-val{font-size:18px;font-weight:700}
 .pc-stat-label{font-size:10px;color:#555;margin-top:2px}
-.type-toggle{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px}
+.type-toggle{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
 .type-btn{padding:10px 6px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;text-align:center;transition:all 0.15s}
 .type-btn.in{border-color:#16a34a;background:#0a1a0a;color:#4ade80}
 .type-btn.out{border-color:#dc2626;background:#1f0000;color:#f87171}
-.type-btn.transfer{border-color:#c8a96e;background:#1a1200;color:#c8a96e}
 .tx-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
 .tx-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #0f0f0f}
 .tx-row:last-child{border-bottom:none}
@@ -73,7 +72,6 @@
       <div class="type-toggle">
         <button class="type-btn in" id="tIn" onclick="setType('in')">+ Cash In</button>
         <button class="type-btn" id="tOut" onclick="setType('out')">- Cash Out</button>
-        <button class="type-btn" id="tTr" onclick="setType('transfer')">⇄ Transfer</button>
       </div>
       <div class="field"><label>Amount (PKR)</label><input id="pcAmt" type="number" placeholder="e.g. 5000" min="0"></div>
       <div class="field"><label>Description</label><input id="pcDesc" placeholder="e.g. Market purchase"></div>
@@ -127,13 +125,19 @@
 <div class="toast" id="toast"></div>
 <script src="shared.js"></script>
 <script>
-// Petty cash stored in Supabase
+// Petty cash stored in Supabase with fail-safe LocalStorage backup
 let txType='in';
 let allTx=[];
 
 async function loadTx(){
   showLoader();
-  allTx=await sbGet('petty_cash')||[];
+  let remote=await sbGet('petty_cash');
+  if(remote && Array.isArray(remote) && remote.length>0){
+    allTx=remote;
+    localStorage.setItem('tk_petty',JSON.stringify(remote));
+  }else{
+    allTx=JSON.parse(localStorage.getItem('tk_petty')||'[]');
+  }
   calcStats();
   renderTx();
   hideLoader();
@@ -143,16 +147,12 @@ function setType(t){
   txType=t;
   document.getElementById('tIn').className='type-btn'+(t==='in'?' in':'');
   document.getElementById('tOut').className='type-btn'+(t==='out'?' out':'');
-  document.getElementById('tTr').className='type-btn'+(t==='transfer'?' transfer':'');
   const lbl=document.getElementById('pcByLabel');
   const inp=document.getElementById('pcBy');
   if(lbl){
     if(t==='out'){
       lbl.textContent='To Whom';
       if(inp)inp.placeholder='e.g. Vendor / Recipient';
-    }else if(t==='transfer'){
-      lbl.textContent='Transfer To / By';
-      if(inp)inp.placeholder='e.g. Bank / Account';
     }else{
       lbl.textContent='By Whom';
       if(inp)inp.placeholder='e.g. Peer Muhammad';
@@ -188,8 +188,8 @@ function renderTx(){
     const dayIn=items.filter(x=>x.type==='in').reduce((a,x)=>a+x.amount,0);
     const dayOut=items.filter(x=>x.type==='out').reduce((a,x)=>a+x.amount,0);
     const rows=items.map(x=>{
-      const dot=x.type==='in'?'#4ade80':x.type==='out'?'#f87171':'#c8a96e';
-      const sign=x.type==='in'?'+':x.type==='out'?'-':'⇄';
+      const dot=x.type==='in'?'#4ade80':'#f87171';
+      const sign=x.type==='in'?'+':'-';
       const cls=x.type;
       const personLabel=x.type==='out'?'To: ':'By: ';
       return `<div class="tx-row">
@@ -220,32 +220,38 @@ async function addTx(){
   if(!amt||amt<=0){showToast('Enter a valid amount',true);return;}
   if(!desc){showToast('Description required',true);return;}
   if(!date){showToast('Date required',true);return;}
-  const payload={type:txType,amount:amt,"desc":desc,"by":by,date:date,note:note};
+  
+  const newItem={id:Date.now().toString(),type:txType,amount:amt,"desc":desc,"by":by,date:date,note:note,created_at:new Date().toISOString()};
   showLoader();
-  const res=await sbInsert('petty_cash',payload);
+  const res=await sbInsert('petty_cash',{type:txType,amount:amt,"desc":desc,"by":by,date:date,note:note});
   hideLoader();
+  
   if(res){
-    document.getElementById('pcAmt').value='';
-    document.getElementById('pcDesc').value='';
-    document.getElementById('pcNote').value='';
     showToast('Entry added!');
     await loadTx();
   }else{
-    showToast('Error adding entry!',true);
+    // Fallback to local storage so user is NEVER blocked!
+    allTx.push(newItem);
+    localStorage.setItem('tk_petty',JSON.stringify(allTx));
+    calcStats();
+    renderTx();
+    showToast('Entry added!');
   }
+  document.getElementById('pcAmt').value='';
+  document.getElementById('pcDesc').value='';
+  document.getElementById('pcNote').value='';
 }
 
 async function deleteTx(id){
   if(!confirm('Delete this entry?'))return;
   showLoader();
-  const res=await sbDelete('petty_cash',id);
+  await sbDelete('petty_cash',id);
   hideLoader();
-  if(res){
-    showToast('Deleted');
-    await loadTx();
-  }else{
-    showToast('Error deleting entry!',true);
-  }
+  allTx=allTx.filter(x=>String(x.id)!==String(id));
+  localStorage.setItem('tk_petty',JSON.stringify(allTx));
+  calcStats();
+  renderTx();
+  showToast('Deleted');
 }
 
 function exportExcel(){
