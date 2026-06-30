@@ -114,89 +114,92 @@ function doLogout(){localStorage.removeItem('tk_role');showToast('Signed out');s
 
 async function downloadDailyMediaReport(){
   showLoader();
-  const allMedia=await sbGet('media_items');
-  const todayStr=new Date().toISOString().slice(0,10);
-  const todayItems=allMedia.filter(x=>x.created_at&&x.created_at.slice(0,10)===todayStr);
+  const allMedia = await sbGet('media_items');
+  const todayStr = new Date().toISOString().slice(0,10);
+  const todayItems = allMedia.filter(x => x.created_at && x.created_at.slice(0,10) === todayStr);
+  hideLoader();
+
   if(!todayItems.length){
-    hideLoader();
-    showToast('No media uploads found for today ('+todayStr+')',true);
+    showToast('No media uploads for today ('+todayStr+')', true);
     return;
   }
-  const rowsHtml=todayItems.map(x=>{
-    const sizeStr=x.top_size_from?`Top: ${x.top_size_from}–${x.top_size_to}`:(x.btm_size_from?`Waist: ${x.btm_size_from}–${x.btm_size_to}`:'—');
-    return `<tr style="border-bottom:1px solid #e2e8f0">
-      <td style="padding:12px;font-weight:bold;color:#dc2626">${x.serial||'—'}</td>
-      <td style="padding:12px;font-weight:600;color:#0f172a">${x.name}</td>
-      <td style="padding:12px;color:#334155">${x.brand||'—'}</td>
-      <td style="padding:12px;color:#334155">${x.category||'—'}</td>
-      <td style="padding:12px;color:#334155">${sizeStr}</td>
-      <td style="padding:12px;text-align:center;font-weight:bold;color:#16a34a">10 Pcs (1 Bundle)</td>
-    </tr>`;
+
+  const formattedDate = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const totalPcs = todayItems.length * 10;
+
+  const rows = todayItems.map((x, i) => {
+    const sizeStr = x.top_size_from
+      ? 'Top: ' + x.top_size_from + '–' + x.top_size_to
+      : x.btm_size_from
+        ? 'Waist: ' + x.btm_size_from + '–' + x.btm_size_to
+        : '—';
+    const bg = i % 2 === 0 ? '#ffffff' : '#f8fafc';
+    return '<tr style="background:' + bg + '">'
+      + '<td style="padding:9px 10px;color:#dc2626;font-weight:700;border-bottom:1px solid #e2e8f0">' + (x.serial||'—') + '</td>'
+      + '<td style="padding:9px 10px;color:#0f172a;font-weight:600;border-bottom:1px solid #e2e8f0">' + (x.name||'—') + '</td>'
+      + '<td style="padding:9px 10px;color:#334155;border-bottom:1px solid #e2e8f0">' + (x.brand||'—') + '</td>'
+      + '<td style="padding:9px 10px;color:#334155;border-bottom:1px solid #e2e8f0">' + (x.category||'—') + '</td>'
+      + '<td style="padding:9px 10px;color:#334155;border-bottom:1px solid #e2e8f0">' + sizeStr + '</td>'
+      + '<td style="padding:9px 10px;color:#16a34a;font-weight:700;border-bottom:1px solid #e2e8f0;text-align:center">10 Pcs<br>(1 Bundle)</td>'
+      + '</tr>';
   }).join('');
-  const totalPcs=todayItems.length*10;
-  const formattedDate=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
-  // Render visibly on-screen so html2canvas can capture it
-  const overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;inset:0;background:#000;opacity:0.85;z-index:99998';
-  document.body.appendChild(overlay);
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    + '<title>TK Daily Media Report ' + todayStr + '</title>'
+    + '<style>'
+    + '*{box-sizing:border-box;margin:0;padding:0}'
+    + 'body{font-family:Arial,Helvetica,sans-serif;color:#1e293b;background:#fff;padding:0}'
+    + '@page{size:A4 portrait;margin:14mm 12mm 14mm 12mm}'
+    + '@media print{'
+    +   'body{-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +   '.noprint{display:none!important}'
+    +   'table{page-break-inside:auto}'
+    +   'tr{page-break-inside:avoid}'
+    + '}'
+    + '.wrap{padding:28px 32px}'
+    + '.header{border-bottom:4px solid #dc2626;padding-bottom:14px;margin-bottom:22px}'
+    + '.header h1{font-size:18px;font-weight:900;color:#0f172a;margin-bottom:5px;letter-spacing:-0.3px}'
+    + '.header p{font-size:12px;color:#64748b}'
+    + '.stats{display:flex;gap:14px;margin-bottom:24px}'
+    + '.stat{flex:1;background:#f8fafc;border:2px solid #e2e8f0;border-radius:8px;padding:14px;text-align:center}'
+    + '.stat-num{font-size:28px;font-weight:900;color:#0f172a}'
+    + '.stat-lbl{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:4px}'
+    + 'table{width:100%;border-collapse:collapse;font-size:12px}'
+    + 'thead tr{background:#0f172a}'
+    + 'th{padding:9px 10px;color:#fff;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}'
+    + '.footer{margin-top:18px;padding-top:12px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:10px;color:#94a3b8}'
+    + '.print-btn{display:block;margin:20px auto;padding:12px 32px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:Arial}'
+    + '</style></head><body>'
+    + '<div class="wrap">'
+    + '<div class="header">'
+    + '<h1>&#128081; THRIFT KINGS — DAILY MEDIA UPLOADS REPORT</h1>'
+    + '<p>Generated for Special User &nbsp;·&nbsp; Date: ' + formattedDate + '</p>'
+    + '</div>'
+    + '<div class="stats">'
+    + '<div class="stat"><div class="stat-num">' + todayItems.length + '</div><div class="stat-lbl">Bundles Uploaded Today</div></div>'
+    + '<div class="stat"><div class="stat-num">' + totalPcs + ' Pcs</div><div class="stat-lbl">Total Estimated Items</div></div>'
+    + '</div>'
+    + '<table>'
+    + '<colgroup><col style="width:70px"><col style="width:auto"><col style="width:110px"><col style="width:95px"><col style="width:95px"><col style="width:100px"></colgroup>'
+    + '<thead><tr>'
+    + '<th>Serial #</th><th>Item / Bundle Name</th><th>Brand</th><th>Category</th><th>Sizes</th><th style="text-align:center">Quantity</th>'
+    + '</tr></thead>'
+    + '<tbody>' + rows + '</tbody>'
+    + '</table>'
+    + '<div class="footer">'
+    + '<span>Thrift Kings Inventory System</span>'
+    + '<span>Total: ' + todayItems.length + ' bundles · ' + totalPcs + ' pcs</span>'
+    + '</div>'
+    + '</div>'
+    + '<button class="print-btn noprint" onclick="window.print()">🖨 Print / Save as PDF</button>'
+    + '</body></html>';
 
-  const printArea=document.createElement('div');
-  printArea.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;overflow:auto;z-index:99999;background:#fff';
-  document.body.appendChild(printArea);
-
-  printArea.innerHTML=`<div style="font-family:Arial,Helvetica,sans-serif;padding:30px;color:#1e293b;background:#ffffff;min-height:100vh">
-    <div style="border-bottom:4px solid #dc2626;padding-bottom:14px;margin-bottom:24px">
-      <h1 style="margin:0;font-size:22px;color:#0f172a;font-family:Arial,sans-serif">&#128081; THRIFT KINGS &mdash; DAILY MEDIA UPLOADS REPORT</h1>
-      <div style="color:#64748b;font-size:13px;margin-top:6px;font-family:Arial,sans-serif">Generated for Special User &middot; Date: ${formattedDate}</div>
-    </div>
-    <div style="display:flex;gap:16px;margin-bottom:28px">
-      <div style="flex:1;background:#f8fafc;border:2px solid #e2e8f0;padding:16px;border-radius:8px;text-align:center">
-        <div style="font-size:22px;font-weight:bold;color:#0f172a;font-family:Arial,sans-serif">${todayItems.length}</div>
-        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;font-family:Arial,sans-serif">Bundles Uploaded Today</div>
-      </div>
-      <div style="flex:1;background:#f8fafc;border:2px solid #e2e8f0;padding:16px;border-radius:8px;text-align:center">
-        <div style="font-size:22px;font-weight:bold;color:#0f172a;font-family:Arial,sans-serif">${totalPcs} Pcs</div>
-        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;font-family:Arial,sans-serif">Total Estimated Items</div>
-      </div>
-    </div>
-    <table style="width:100%;border-collapse:collapse">
-      <thead>
-        <tr style="background:#0f172a">
-          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Serial #</th>
-          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Item / Bundle Name</th>
-          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Brand</th>
-          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Category</th>
-          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:left;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Sizes</th>
-          <th style="padding:10px 8px;font-size:11px;color:#ffffff;text-align:center;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.5px">Quantity</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rowsHtml}
-      </tbody>
-    </table>
-  </div>`;
-
-  const opt={
-    margin:[8,8,8,8],
-    filename:'TK_Daily_Media_Report_'+todayStr+'.pdf',
-    image:{type:'jpeg',quality:0.98},
-    html2canvas:{scale:2,logging:false,useCORS:true,allowTaint:true,backgroundColor:'#ffffff'},
-    jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}
-  };
-  
-  html2pdf().set(opt).from(printArea.firstChild).save().then(() => {
-    printArea.remove();
-    overlay.remove();
-    hideLoader();
-    showToast('PDF downloaded successfully!');
-  }).catch(err => {
-    printArea.remove();
-    overlay.remove();
-    hideLoader();
-    console.error(err);
-    showToast('PDF download failed', true);
-  });
+  const w = window.open('', '_blank', 'width=900,height=700');
+  if(!w){ showToast('Allow popups to generate PDF', true); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => { try{ w.focus(); w.print(); }catch(e){} }, 800);
 }
 
 init();
