@@ -5,14 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Bells Register - Thrift Kings</title>
 <link rel="stylesheet" href="style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>window._tkLogo="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";
 </script>
 <style>
 /* ── Bells Page Styles ─────────────────────────────── */
 .bells-hero{background:linear-gradient(135deg,#0a0d1a,#0a0a0a);border:1px solid #1a1f3a;border-radius:14px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden}
 .bells-hero::before{content:'';position:absolute;top:-20px;right:-20px;width:110px;height:110px;background:radial-gradient(circle,rgba(99,102,241,0.15) 0%,transparent 70%)}
-.bells-hero::after{content:'🔔';position:absolute;top:14px;right:18px;font-size:32px;opacity:0.15}
+.bells-hero::after{content:'';display:none}
 .bells-total-val{font-size:38px;font-weight:800;color:#818cf8;line-height:1;letter-spacing:-1px}
 .bells-total-label{font-size:10px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
 .bells-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
@@ -68,7 +67,7 @@
     <div style="display:flex;align-items:center;gap:10px">
       <button class="btn-back" onclick="location.href='account.html'" id="backBtn" style="background:none;border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--muted);cursor:pointer;font-family:inherit;font-size:12px">← Back</button>
       <div>
-        <div style="font-size:15px;font-weight:700;color:var(--white)">🔔 Bells Register</div>
+        <div style="font-size:15px;font-weight:700;color:var(--white)">📦 Bells Register</div>
         <div style="font-size:10px;color:var(--muted)">Thrift Kings</div>
       </div>
     </div>
@@ -136,7 +135,7 @@
     <!-- ── Bells List ── -->
     <div class="section-head"><span class="section-label">All Bells</span></div>
     <div id="bellsList">
-      <div class="bells-empty"><div class="bells-empty-icon">🔔</div><div>No bells registered yet</div></div>
+      <div class="bells-empty"><div class="bells-empty-icon">📦</div><div>No bells registered yet</div></div>
     </div>
 
   </div><!-- /padding -->
@@ -146,10 +145,10 @@
 <div id="pdf-content" style="display:none;background:#0a0a0a;color:#e5e7eb;font-family:system-ui,sans-serif;padding:24px;min-width:600px">
   <div class="pdf-header">
     <div>
-      <div class="pdf-title">🔔 Bells Register</div>
+      <div class="pdf-title">📦 Bells Register</div>
       <div class="pdf-subtitle" id="pdfSubtitle">Thrift Kings — Generated on —</div>
     </div>
-    <div style="font-size:28px;opacity:0.3">🔔</div>
+    <div style="font-size:20px;font-weight:800;color:#818cf8;opacity:0.3">B</div>
   </div>
   <div class="pdf-summary">
     <div class="pdf-sum-box">
@@ -302,7 +301,7 @@ function updateHero(data){
 function renderBells(data){
   const container=document.getElementById('bellsList');
   if(!data||data.length===0){
-    container.innerHTML='<div class="bells-empty"><div class="bells-empty-icon">🔔</div><div>No bells registered yet</div></div>';
+    container.innerHTML='<div class="bells-empty"><div class="bells-empty-icon">📦</div><div>No bells registered yet</div></div>';
     return;
   }
   const role=getRole();
@@ -314,7 +313,7 @@ function renderBells(data){
       '<button class="bell-delete-btn" onclick="deleteBell('+b.id+',\''+b.item_name.replace(/'/g,"\\'")+'\')" title="Delete">×</button>':'';
     return `<div class="bell-card">
       <div class="bell-row">
-        <div class="bell-icon">🔔</div>
+        <div class="bell-icon" style="font-size:14px;font-weight:800;color:#818cf8">B</div>
         <div class="bell-info">
           <div class="bell-name">${b.item_name}</div>
           <div class="bell-meta">${b.total_bells} bell${b.total_bells!==1?'s':''} × ${bw} kg${b.notes?' · '+b.notes:''}</div>
@@ -332,59 +331,98 @@ function renderBells(data){
 
 // ── PDF Export ───────────────────────────────────────
 function exportPDF(){
-  if(!allBells||allBells.length===0){showToast('No data to export',true);return;}
+  if(!allBells||!allBells.length){ showToast('No bells to export', true); return; }
 
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
-  const timeStr=now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const totalWeight = allBells.reduce((a,b) => a + (parseFloat(b.total_weight)||0), 0);
+  const totalBells  = allBells.reduce((a,b) => a + (parseInt(b.total_bells)||0), 0);
+  const formattedDate = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
-  document.getElementById('pdfSubtitle').textContent='Thrift Kings — Generated on '+dateStr+' at '+timeStr;
+  const rows = allBells.map((b, i) => {
+    const tw   = parseFloat(b.total_weight||0).toFixed(2);
+    const bw   = parseFloat(b.bell_weight||0).toFixed(2);
+    const date = b.created_at ? new Date(b.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const bg   = i % 2 === 0 ? '#ffffff' : '#f8fafc';
+    return '<tr style="background:' + bg + '">'
+      + '<td style="padding:9px 12px;font-weight:600;color:#0f172a;border-bottom:1px solid #e2e8f0">' + (b.item_name||'—') + '</td>'
+      + '<td style="padding:9px 12px;color:#6366f1;font-weight:700;border-bottom:1px solid #e2e8f0;text-align:center">' + (b.total_bells||0) + '</td>'
+      + '<td style="padding:9px 12px;color:#334155;border-bottom:1px solid #e2e8f0;text-align:right">' + bw + ' kg</td>'
+      + '<td style="padding:9px 12px;font-weight:700;color:#6366f1;border-bottom:1px solid #e2e8f0;text-align:right">' + tw + ' kg</td>'
+      + '<td style="padding:9px 12px;color:#64748b;font-size:11px;border-bottom:1px solid #e2e8f0">' + (b.notes||'—') + '</td>'
+      + '<td style="padding:9px 12px;color:#94a3b8;font-size:11px;border-bottom:1px solid #e2e8f0">' + date + '</td>'
+      + '</tr>';
+  }).join('');
 
-  const totalBells=allBells.reduce((s,r)=>s+(r.total_bells||0),0);
-  const totalWeight=allBells.reduce((s,r)=>s+(parseFloat(r.total_weight)||0),0);
-  document.getElementById('pdfTotalBells').textContent=totalBells.toLocaleString();
-  document.getElementById('pdfTotalWeight').textContent=totalWeight.toFixed(2);
-  document.getElementById('pdfItemCount').textContent=allBells.length;
+  const html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    + '<title>Bells Register Report</title>'
+    + '<style>'
+    + '*{box-sizing:border-box;margin:0;padding:0}'
+    + 'body{font-family:Arial,Helvetica,sans-serif;color:#1e293b;background:#fff}'
+    + '@page{size:A4 landscape;margin:12mm 14mm}'
+    + '@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}.noprint{display:none!important}tr{page-break-inside:avoid}}'
+    + '.wrap{padding:24px 28px}'
+    + '.header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px}'
+    + '.header h1{font-size:20px;font-weight:900;color:#0f172a;letter-spacing:-0.3px;margin-bottom:4px}'
+    + '.header p{font-size:12px;color:#64748b}'
+    + '.badge{background:#f1f0ff;border:2px solid #6366f1;border-radius:8px;padding:10px 16px;text-align:center}'
+    + '.badge-val{font-size:24px;font-weight:900;color:#6366f1}'
+    + '.badge-lbl{font-size:9px;color:#818cf8;text-transform:uppercase;letter-spacing:1px;margin-top:2px}'
+    + '.accent{height:3px;background:linear-gradient(90deg,#6366f1,#a5b4fc,transparent);border-radius:2px;margin:14px 0}'
+    + '.cards{display:flex;gap:12px;margin-bottom:20px}'
+    + '.card{flex:1;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;text-align:center}'
+    + '.card-val{font-size:22px;font-weight:900;color:#6366f1}'
+    + '.card-lbl{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:3px}'
+    + 'table{width:100%;border-collapse:collapse;font-size:12px}'
+    + 'thead tr{background:#0f172a}'
+    + 'th{padding:9px 12px;color:#fff;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}'
+    + 'tfoot tr{background:#f1f0ff}'
+    + 'tfoot td{padding:9px 12px;font-weight:700;color:#6366f1;font-size:12px;border-top:2px solid #6366f1}'
+    + '.footer{margin-top:14px;padding-top:10px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:10px;color:#94a3b8}'
+    + '.print-btn{display:block;margin:20px auto;padding:12px 32px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:Arial}'
+    + '</style></head><body>'
+    + '<div class="wrap">'
+    + '<div class="header">'
+    + '<div><h1>THRIFT KINGS — BELLS REGISTER</h1><p>Generated: ' + formattedDate + '</p></div>'
+    + '<div class="badge"><div class="badge-val">' + allBells.length + '</div><div class="badge-lbl">Total Entries</div></div>'
+    + '</div>'
+    + '<div class="accent"></div>'
+    + '<div class="cards">'
+    + '<div class="card"><div class="card-val">' + allBells.length + '</div><div class="card-lbl">Unique Items</div></div>'
+    + '<div class="card"><div class="card-val">' + totalBells + '</div><div class="card-lbl">Total Bells</div></div>'
+    + '<div class="card"><div class="card-val">' + totalWeight.toFixed(2) + ' kg</div><div class="card-lbl">Total Weight</div></div>'
+    + '</div>'
+    + '<table>'
+    + '<colgroup><col style="width:auto"><col style="width:80px"><col style="width:90px"><col style="width:90px"><col style="width:auto"><col style="width:100px"></colgroup>'
+    + '<thead><tr>'
+    + '<th>Item Name</th>'
+    + '<th style="text-align:center">Bells</th>'
+    + '<th style="text-align:right">Bell Weight</th>'
+    + '<th style="text-align:right">Total Weight</th>'
+    + '<th>Notes</th>'
+    + '<th>Date Added</th>'
+    + '</tr></thead>'
+    + '<tbody>' + rows + '</tbody>'
+    + '<tfoot><tr>'
+    + '<td>TOTALS</td>'
+    + '<td style="text-align:center">' + totalBells + '</td>'
+    + '<td></td>'
+    + '<td style="text-align:right">' + totalWeight.toFixed(2) + ' kg</td>'
+    + '<td></td><td></td>'
+    + '</tr></tfoot>'
+    + '</table>'
+    + '<div class="footer">'
+    + '<span>Thrift Kings Inventory System — Bells Register</span>'
+    + '<span>' + allBells.length + ' entries · ' + totalBells + ' bells · ' + totalWeight.toFixed(2) + ' kg</span>'
+    + '</div>'
+    + '</div>'
+    + '<button class="print-btn noprint" onclick="window.print()">🖨 Print / Save as PDF</button>'
+    + '</body></html>';
 
-  const tbody=document.getElementById('pdfTableBody');
-  tbody.innerHTML=allBells.map((b,i)=>{
-    const tw=parseFloat(b.total_weight||0).toFixed(2);
-    const bw=parseFloat(b.bell_weight||0).toFixed(2);
-    const date=b.created_at?new Date(b.created_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'—';
-    return `<tr>
-      <td>${i+1}</td>
-      <td><strong>${b.item_name}</strong></td>
-      <td>${bw}</td>
-      <td>${b.total_bells}</td>
-      <td style="color:#818cf8;font-weight:700">${tw}</td>
-      <td style="color:#6b7280">${b.notes||'—'}</td>
-      <td style="color:#6b7280">${date}</td>
-    </tr>`;
-  }).join('')+`<tr class="total-row">
-    <td colspan="3"><strong>TOTALS</strong></td>
-    <td><strong>${totalBells}</strong></td>
-    <td><strong>${totalWeight.toFixed(2)}</strong></td>
-    <td colspan="2"></td>
-  </tr>`;
-
-  const el=document.getElementById('pdf-content');
-  el.style.display='block';
-
-  const opt={
-    margin:[8,8,8,8],
-    filename:'bells-register-'+now.toISOString().slice(0,10)+'.pdf',
-    image:{type:'jpeg',quality:0.95},
-    html2canvas:{scale:2,useCORS:true,backgroundColor:'#0a0a0a'},
-    jsPDF:{unit:'mm',format:'a4',orientation:'landscape'}
-  };
-
-  html2pdf().set(opt).from(el).save().then(()=>{
-    el.style.display='none';
-    showToast('PDF exported!');
-  }).catch(()=>{
-    el.style.display='none';
-    showToast('PDF export failed',true);
-  });
+  const w = window.open('', '_blank', 'width=1000,height=700');
+  if(!w){ showToast('Allow popups to generate PDF', true); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => { try{ w.focus(); w.print(); }catch(e){} }, 800);
 }
 
 // ── Init ─────────────────────────────────────────────

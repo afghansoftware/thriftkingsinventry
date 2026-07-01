@@ -61,7 +61,7 @@
     </div>
 
     <div id="msg" style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Loading...</div>
-    <div id="list" style="display:none"></div>
+    <div id="list" style="display:none;padding-bottom:8px"></div>
   </div>
 </div>
 <nav class="bottom-nav">
@@ -122,11 +122,20 @@ function showToast(msg,err){const t=document.getElementById('toast');t.textConte
 function initRole(){const r=getRole(),b=document.getElementById('roleBadge');if(r==='admin'){b.textContent='Admin';b.className='role-badge';}else if(r==='media'){b.textContent='Media';b.className='role-badge media';}else if(r==='special'){b.textContent='Special';b.className='role-badge special';}else{b.textContent='Viewing';b.className='role-badge customer';}}
 
 let all=[],eid=null;
-function toggleForm(){const f=document.getElementById('qf');f.style.display=f.style.display==='none'?'block':'none';}
+function toggleForm(){
+  const f=document.getElementById('qf');
+  const btn=document.getElementById('addBtn');
+  const open=f.style.display==='none';
+  f.style.display=open?'block':'none';
+  btn.innerHTML=open
+    ?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>Close'
+    :'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add';
+  if(open)f.scrollIntoView({behavior:'smooth',block:'start'});
+}
 async function init(){
   showLoader();
   initRole();
-  if(canEdit()){document.getElementById('addBtn').style.display='flex';document.getElementById('qf').style.display='block';}
+  if(canEdit()){document.getElementById('addBtn').style.display='flex';}
   all=await sbGet('media_items');
   document.getElementById('msg').style.display='none';document.getElementById('list').style.display='';renderG();
   hideLoader();
@@ -146,7 +155,7 @@ function renderG(){
   el.innerHTML=keys.map(k=>{
     const items=grp[k];
     const lbl=k==='unknown'?'Unknown Date':fmtDate(items[0].created_at);
-    const rows=items.map((x,i)=>`<div class="item-card" style="border-radius:8px;margin-bottom:8px">
+    const rows=items.map((x,i)=>`<div class="item-card" style="border-radius:8px;margin-bottom:8px;overflow:visible">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
         <div><div style="font-size:10px;color:var(--muted);margin-bottom:2px">Item ${i+1}</div>
           <div class="item-name" style="font-size:13px">${x.name}</div>
@@ -161,7 +170,7 @@ function renderG(){
       </div>
       ${canEdit()?`<div class="act-row"><button class="btn-edit" onclick="openModal('${x.id}')">Edit</button><button class="btn-del" onclick="del('${x.id}')">Delete</button></div>`:''}
     </div>`).join('');
-    return `<div style="margin-bottom:18px">
+    return `<div style="margin-bottom:20px;overflow:visible;scroll-margin-top:70px">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
         <div style="flex:1;height:1px;background:var(--border)"></div>
         <div style="font-size:11px;font-weight:600;color:var(--red-light);white-space:nowrap">${lbl} <span style="color:var(--muted);font-weight:400">(${items.length} item${items.length!==1?'s':''})</span></div>
@@ -229,7 +238,7 @@ function genDesc(x){
   var sz=x.top_size_from?'Sizes: '+x.category+': '+x.top_size_from+'-'+x.top_size_to:x.btm_size_from?'Sizes: Waist '+x.btm_size_from+'-'+x.btm_size_to:'';
   var sc=x.top_size_from?x.top_size_from+' to '+x.top_size_to:x.btm_size_from?'Waist '+x.btm_size_from+' to '+x.btm_size_to:'';
   var b=x.brand||'',n=x.name||'',s=x.serial||'';
-  return 'The images and videos show the exact products that are a part of the bundle.\nGrade: AB\n'+sz+'\nThe bundle contains the following brands: '+b+'\n'+b+' '+n+' Premium Quality '+b+' '+n+'\n\u2714\ufe0f Serial: '+s+'\n\u2714\ufe0f Grade: AB\n\u2714\ufe0f Condition: Excellent\n\u2714\ufe0f Sizes: '+sc+'\n\u2714\ufe0f Quantity: 10 Pcs\n\u2714\ufe0f You will receive the exact items shown in the video & pictures\n\u2714\ufe0f High Demand Item Brand: '+b;
+  return 'The images and videos show the exact products that are a part of the bundle.\nGrade: AB\n'+sz+'\nThe bundle contains the following brands: '+b+'\n'+n+' - Premium Quality\n\u2714\ufe0f Serial: '+s+'\n\u2714\ufe0f Grade: AB\n\u2714\ufe0f Condition: Excellent\n\u2714\ufe0f Sizes: '+sc+'\n\u2714\ufe0f Quantity: 10 Pcs\n\u2714\ufe0f You will receive the exact items shown in the video & pictures\n\u2714\ufe0f High Demand Item Brand: '+b;
 }
 function dlCSV(){
   var rows=[['Date','Serial','Name','Brand','Category','Top From','Top To','Waist From','Waist To','Description']];
